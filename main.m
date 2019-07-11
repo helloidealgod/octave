@@ -14,9 +14,12 @@ for i = 1 : n,
 end;
 fprintf('data load done \n');
 clear images;
-k1 = randn(5,5,20);
-k2 = randn(3,3,40);
-k3 = randn(3,3,60);
+k1 = 0.01 .* randn(5,5,20);
+b1 = 0.01 .* randn(20,1);
+k2 = 0.01 .* randn(3,3,40);
+b2 = 0.01 .* randn(40,1);
+k3 = 0.01 .* randn(3,3,60);
+b3 = 0.01 .* randn(60,1);
 c1 = zeros(24,24,20);
 c2 = zeros(10,10,40);
 c3 = zeros(3,3,60);
@@ -26,23 +29,23 @@ position2 = zeros(10,10,40);
 p2 = zeros(5,5,40);
 fprintf('start conv \n');
 for i = 1:20,
-  c1(:,:,i) = max(0,convn(image(:,:,1),k1(:,:,i),'valid'));
+  c1(:,:,i) = max(0,convn(image(:,:,1),k1(:,:,i),'valid') .+ b1(i,1));
   [p1(:,:,i),position1(:,:,i)] = maxPooling(c1(:,:,i));
 end;
 fprintf('conv1 done \n');
 for i = 1:40,
-  c2(:,:,i) = max(0,convn(p1(:,:,1),k2(:,:,i),'valid'));
+  c2(:,:,i) = max(0,convn(p1(:,:,1),k2(:,:,i),'valid') .+ b2(i,1));
   [p2(:,:,i),position2(:,:,i)] = maxPooling(c2(:,:,i));
 end;
 fprintf('conv2 done \n');
 for i = 1:60,
-  c3(:,:,i) = max(0,convn(p2(:,:,1),k3(:,:,i),'valid'));
+  c3(:,:,i) = max(0,convn(p2(:,:,1),k3(:,:,i),'valid') .+ b3(i,1));
 end;
 fprintf('conv3 done \n');
 f1 = c3(:);
-w1 = randn(160,540);
-b1 = rand(160,1);
-f2 = max(0,w1*f1 + b1);
+w1 = 0.01 .* randn(160,540);
+bf = 0.01 .* rand(160,1);
+f2 = max(0,w1*f1 + bf);
 fprintf('full done \n');
 ws = rand(10,160);
 bs = rand(10,1);
