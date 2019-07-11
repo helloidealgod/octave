@@ -1,4 +1,5 @@
 function [c1,p1,position1,c2,p2,position2,c3,f2,fs,out] = main()
+fprintf('start reading file ... \n');
 images = loadMNISTImages("t10k-images.idx3-ubyte");
 labels = loadMNISTLabels("t10k-labels.idx1-ubyte");
 fprintf('file read done \n');
@@ -6,6 +7,7 @@ fprintf('file read done \n');
 #fprintf('%f \n',size(labels));
 [m,n] = size(images);
 image = zeros(28,28,n);
+fprintf('start loading data ...\n');
 for i = 1 : n,
   #fprintf('%f \n',i);
   image(:,:,i) = reshape(images(:,i),28,28);
