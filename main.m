@@ -1,4 +1,4 @@
-function [c1,p1,position1,c2,p2,position2,c3,f2,fs,out] = main()
+function [c1,p1,position1,c2,p2,position2,c3,f2,fs,out,loss] = main()
 fprintf('start reading file ... \n');
 images = loadMNISTImages("t10k-images.idx3-ubyte");
 labels = loadMNISTLabels("t10k-labels.idx1-ubyte");
@@ -52,4 +52,22 @@ bs = rand(10,1);
 fs = ws*f2 + bs;
 out = softmax(fs);
 fprintf('softmax done \n');
+loss = -log(out(labels(1)));
+fprintf('loss = loss \n');
+#===========================================================================================================================
+#kron
+#a = [1 2;3 4];
+#b = [1 1;1 1];
+#c = kron(a,b);
+dbs = out;
+dbs(labels(1)) = dbs(labels(1)) - 1;
+dws = dbs*f2';
+dbf = ws' * dbs;
 end;
+
+
+
+
+
+
+
