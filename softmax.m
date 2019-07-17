@@ -1,4 +1,4 @@
 function out = softmax(in)
 sum = sum(exp(in));
-out = in./sum;
+out = exp(in)./sum;
 end;
