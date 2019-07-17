@@ -1,4 +1,4 @@
-function [c1,p1,position1,c2,p2,position2,c3,f2,fs,out,loss] = main()
+function main()
 fprintf('start reading file ... \n');
 images = loadMNISTImages("t10k-images.idx3-ubyte");
 labels = loadMNISTLabels("t10k-labels.idx1-ubyte");
@@ -14,55 +14,74 @@ for i = 1 : n,
 end;
 fprintf('data load done \n');
 clear images;
-k1 = 0.01 .* randn(5,5,20);
-b1 = 0.01 .* randn(20,1);
-k2 = 0.01 .* randn(3,3,40);
-b2 = 0.01 .* randn(40,1);
-k3 = 0.01 .* randn(3,3,60);
-b3 = 0.01 .* randn(60,1);
-c1 = zeros(24,24,20);
-c2 = zeros(10,10,40);
-c3 = zeros(3,3,60);
-position1 = zeros(24,24,20);
-p1 = zeros(12,12,20);
-position2 = zeros(10,10,40);
-p2 = zeros(5,5,40);
+#===========================================================================================================================
+filter_1 = 0.01 .* randn(5,5,20);
+bias_1 = 0.01 .* randn(20,1);
+conv_out_1 = zeros(24,24,20);
+max_index_1 = zeros(24,24,20);
+max_pool_1 = zeros(12,12,20);
+#===========================================================================================================================
+filter_2 = 0.01 .* randn(3,3,20,40);
+bias_2 = 0.01 .* randn(40,1);
+conv_out_2 = zeros(10,10,40);
+max_index_2 = zeros(10,10,40);
+max_pool_2 = zeros(5,5,40);
+#===========================================================================================================================
+filter_3 = 0.01 .* randn(3,3,40,60);
+bias_3 = 0.01 .* randn(60,1);
+conv_out_3 = zeros(3,3,60);
+#===========================================================================================================================
 fprintf('start conv \n');
 for i = 1:20,
-  c1(:,:,i) = max(0,convn(image(:,:,1),k1(:,:,i),'valid') .+ b1(i,1));
-  [p1(:,:,i),position1(:,:,i)] = maxPooling(c1(:,:,i));
+  conv_out_1(:,:,i) = max(0,convn(image(:,:,1),filter_1(:,:,i),'valid') .+ bias_1(i,1));
+  [max_pool_1(:,:,i),max_index_1(:,:,i)] = maxPooling(conv_out_1(:,:,i));
 end;
 fprintf('conv1 done \n');
 for i = 1:40,
-  c2(:,:,i) = max(0,convn(p1(:,:,1),k2(:,:,i),'valid') .+ b2(i,1));
-  [p2(:,:,i),position2(:,:,i)] = maxPooling(c2(:,:,i));
+  conv_out_2(:,:,i) = max(0,convn(max_pool_1,filter_2(:,:,:,i),'valid') .+ bias_2(i,1));
+  [max_pool_2(:,:,i),max_index_2(:,:,i)] = maxPooling(conv_out_2(:,:,i));
 end;
 fprintf('conv2 done \n');
 for i = 1:60,
-  c3(:,:,i) = max(0,convn(p2(:,:,1),k3(:,:,i),'valid') .+ b3(i,1));
+  conv_out_3(:,:,i) = max(0,convn(max_pool_2,filter_3(:,:,:,i),'valid') .+ bias_3(i,1));
 end;
 fprintf('conv3 done \n');
-f1 = c3(:);
+#===========================================================================================================================
+x = conv_out_3(:);
 w1 = 0.01 .* randn(160,540);
-bf = 0.01 .* rand(160,1);
-f2 = max(0,w1*f1 + bf);
+b1 = 0.01 .* rand(160,1);
+z1 = w1*x + b1;
+a1 = max(0,z1);
 fprintf('full done \n');
-ws = rand(10,160);
-bs = rand(10,1);
-fs = ws*f2 + bs;
-out = softmax(fs);
+#===========================================================================================================================
+w2 = rand(10,160);
+b2 = rand(10,1);
+z2 = w2*a1 + b2;
+a2 = z2;
+p = softmax(a2);
 fprintf('softmax done \n');
-loss = -log(out(labels(1)));
+#===========================================================================================================================
+loss = -log(p(labels(1)));
 fprintf('loss = loss \n');
 #===========================================================================================================================
+
+db2 = p;
+db2(labels(1)) = db2(labels(1)) - 1;
+dw2 = db2 * a1';
+
+da1 = w2' * db2;
+dz1 = grelu(a1) .* da1;
+db1 = dz1;
+dw1 = db1 * x';
+dx = w1' * db1;
+
+
+dconv_out_3 = reshape(dx,3,3,60);
+fprintf("end\n");
 #kron
 #a = [1 2;3 4];
 #b = [1 1;1 1];
 #c = kron(a,b);
-dbs = out;
-dbs(labels(1)) = dbs(labels(1)) - 1;
-dws = dbs*f2';
-dbf = ws' * dbs;
 end;
 
 
