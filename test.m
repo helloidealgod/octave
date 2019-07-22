@@ -76,10 +76,13 @@ dc3 = reshape(dc3,3,3,60) .* grelu3(c3);
 #dx(5,5,40) = dL(3,3,60) 卷积 rot180(w(3,3,40,60)) full
 dbias3 = zeros(60,1);
 dfilter3 = zeros(3,3,40,60);
+dx3 = zeros(5,5,40);
+rfilter3 = rot90(rot90(filter3));
 for i = 1 : 60,
   dbias3 = sum(sum(dc3(:,:,i)));
   for j = 1 : 40,
-    dfilter3(:,:,j,i) = dfilter3(:,:,j,i) + convn(max_pool_2(:,:,j),dc3(:,:,i),'valid');
+    dfilter3(:,:,j,i) = dfilter3(:,:,j,i) .+ convn(max_pool_2(:,:,j),dc3(:,:,i),'valid');
+    dx3(:,:,j) = dx3(:,:,j) .+ convn(dc3(:,:,i),rfilter3(:,:,j,i),'full');
   end;
 end;
 #动量梯度下降法 softmax层更新参数
