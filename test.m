@@ -1,8 +1,20 @@
 function test()
 #定义样本
-x = randn(5,5,40);
+x = randn(28,28,1);
+#x = randn(12,12,20);
+#x = randn(5,5,40);
 #定义标签
 y = [0 0 0 0 0 0 0 0 1 0];
+#定义卷积层1
+filter1 = 0.01 * randn(5,5,1,20);
+bias1 = 0.01 * rand(20,1);
+vfilter1 = zeros(5,5,1,20);
+vbias1 = zeros(20,1);
+#定义卷积层2
+filter2 = 0.01 * randn(3,3,20,40);
+bias2 = 0.01 * rand(40,1);
+vfilter2 = zeros(3,3,20,40);
+vbias2 = zeros(40,1);
 #定义卷积层3
 filter3 = 0.01 * randn(3,3,40,60);
 bias3 = 0.01 * rand(60,1);
@@ -19,8 +31,19 @@ b2 = 0.01 * randn(10,1);
 vw2 = zeros(10,160);
 vb2 = zeros(10,1);
 #前向计算
+#计算卷积层1
+for i = 1:20,
+  c1(:,:,i) = max(0,convn(x,filter1(:,:,:,i),'valid') .+ bias1(i,1));
+  [max_pool_1(:,:,i),max_index_1(:,:,i)] = maxPooling(c1(:,:,i));
+end;
+#计算卷积层2
+for i = 1:40,
+  c2(:,:,i) = max(0,convn(max_pool_1,filter2(:,:,:,i),'valid') .+ bias2(i,1));
+  [max_pool_2(:,:,i),max_index_2(:,:,i)] = maxPooling(c2(:,:,i));
+end;
+#计算卷积层3
 for i = 1:60,
-  c3(:,:,i) = max(0,convn(x,filter3(:,:,:,i),'valid') .+ bias3(i,1));
+  c3(:,:,i) = max(0,convn(max_pool_2,filter3(:,:,:,i),'valid') .+ bias3(i,1));
 end;
 z1 = w1*c3(:) + b1;
 a1 = max(0,z1);
@@ -56,7 +79,7 @@ dfilter3 = zeros(3,3,40,60);
 for i = 1 : 60,
   dbias3 = sum(sum(dc3(:,:,i)));
   for j = 1 : 40,
-    dfilter3(:,:,j,i) = dfilter3(:,:,j,i) + convn(x(:,:,j),dc3(:,:,i),'valid');
+    dfilter3(:,:,j,i) = dfilter3(:,:,j,i) + convn(max_pool_2(:,:,j),dc3(:,:,i),'valid');
   end;
 end;
 #动量梯度下降法 softmax层更新参数
@@ -75,8 +98,19 @@ vbias3 = 0.9 * vbias3 + 0.1 * dbias3;
 filter3 = filter3 - 0.01 * vfilter3;
 bias3 = bias3 - 0.01 * vbias3;
 #前向计算
+#计算卷积层1
+for i = 1:20,
+  c1(:,:,i) = max(0,convn(x,filter1(:,:,:,i),'valid') .+ bias1(i,1));
+  [max_pool_1(:,:,i),max_index_1(:,:,i)] = maxPooling(c1(:,:,i));
+end;
+#计算卷积层2
+for i = 1:40,
+  c2(:,:,i) = max(0,convn(max_pool_1,filter2(:,:,:,i),'valid') .+ bias2(i,1));
+  [max_pool_2(:,:,i),max_index_2(:,:,i)] = maxPooling(c2(:,:,i));
+end;
+#计算卷积层3
 for i = 1:60,
-  c3(:,:,i) = max(0,convn(x,filter3(:,:,:,i),'valid') .+ bias3(i,1));
+  c3(:,:,i) = max(0,convn(max_pool_2,filter3(:,:,:,i),'valid') .+ bias3(i,1));
 end;
 z1 = w1*c3(:) + b1;
 a1 = max(0,z1);
@@ -91,6 +125,7 @@ printf("iterate = %d,loss = %f \n",iterate,loss);
 t=[t iterate];
 m=[m loss];
 set(plot,'XData',t,'YData',m);
-pause(0.01);
+drawnow;
+#pause(0.01);
 end;
 end;
