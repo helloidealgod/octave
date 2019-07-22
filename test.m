@@ -29,9 +29,15 @@ p = softmax(z2);
 #计算loss
 loss = -log(p(9));
 #fprintf("p = %f \n",p);
-fprintf("loss = %f \n",loss);
+#printf("loss = %f \n",loss);
 #循环,99%时停止
 iterate = 0;
+t=[0];
+m=[loss];
+plot = plot(t,m,'EraseMode','background','MarkerSize',5);
+axis([0 50 -2.5 2.5]);
+#打开网格
+grid on;
 while loss > 0.01,
 #softmax层梯度
 db2 = p - y';
@@ -80,7 +86,11 @@ p = softmax(z2);
 loss = -log(p(9));
 iterate ++;
 #fprintf("p = %f \n",p);
-fprintf("iterate = %d,loss = %f \n",iterate,loss);
-#disp(loss);
+printf("iterate = %d,loss = %f \n",iterate,loss);
+
+t=[t iterate];
+m=[m loss];
+set(plot,'XData',t,'YData',m);
+pause(0.01);
 end;
 end;

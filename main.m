@@ -54,7 +54,15 @@ vbais_1 = zeros(20,1);
 # 0.05129  95%
 # 0.01     99%
 min_loss = 5;
-while min_loss > 0.1625
+iterate = 0;
+
+t=[0];
+m=[min_loss];
+plot = plot(t,m,'EraseMode','background','MarkerSize',5);
+axis([0 50 -2.5 2.5]);
+grid on;
+
+while min_loss > 0.01
 #fprintf('start conv \n');
 for i = 1:20,
   conv_out_1(:,:,i) = max(0,convn(image(:,:,1),filter_1(:,:,i),'valid') .+ bias_1(i,1));
@@ -85,7 +93,14 @@ p = softmax(a2);
 #===========================================================================================================================
 loss = -log(p(labels(1)));
 min_loss = loss;
-fprintf('loss = %f\n',loss)
+iterate ++;
+fprintf('iterate = %d loss = %f\n',iterate,loss)
+
+t=[t iterate];
+m=[m loss];
+set(plot,'XData',t,'YData',m);
+pause(0.01);
+
 #===========================================================================================================================
 db2 = p;
 db2(labels(1)) = db2(labels(1)) - 1;
