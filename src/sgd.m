@@ -5,7 +5,8 @@ addpath('./data');
 #参数初始化
 [filter1,bias1,vfilter1,vbias1,filter2,bias2,vfilter2,vbias2,filter3,bias3,vfilter3,vbias3,w1,b1,vw1,vb1,w2,b2,vw2,vb2] = init_params();
 #前向计算
-[c1,max_pool_1,max_index_1,c2,max_pool_2,max_index_2,c3,z1,a1,z2,p,loss] = forward(images,filter1,filter2,filter3,w1,w2,bias1,bias2,bias3,b1,b2,7);
+[c1,max_pool_1,max_index_1,c2,max_pool_2,max_index_2,c3,z1,a1,z2,p,loss] = ...
+forward(images,filter1,filter2,filter3,w1,w2,bias1,bias2,bias3,b1,b2,labels(1));
 fprintf('loss = %f \n',loss);
 iterate = 0;
 t=[0];
@@ -16,7 +17,8 @@ axis([0 300 -2.5 2.5]);
 grid on;
 while loss > 0.01,
 #后向计算
-[dfilter1,dfilter2,dfilter3,dw1,dw2,dbias1,dbias2,dbias3,db1,db2] = backward(images,p,labels(1),max_pool_1,max_index_1,filter2,max_pool_2,max_index_2,filter3,c3,w1,w2,z1,a1);
+[dfilter1,dfilter2,dfilter3,dw1,dw2,dbias1,dbias2,dbias3,db1,db2] = ...
+backward(images,p,labels(1),max_pool_1,max_index_1,filter2,max_pool_2,max_index_2,filter3,c3,w1,w2,z1,a1);
 
 #动量梯度下降法 softmax层更新参数
 vw2 = 0.9 * vw2 + 0.1 * dw2;
@@ -44,7 +46,8 @@ vbias1 = 0.9 * vbias1 + 0.1 * dbias1;
 filter1 = filter1 - 0.01 * vfilter1;
 bias1 = bias1 - 0.01 * vbias1;
 #前向计算
-[c1,max_pool_1,max_index_1,c2,max_pool_2,max_index_2,c3,z1,a1,z2,p,loss] = forward(images,filter1,filter2,filter3,w1,w2,bias1,bias2,bias3,b1,b2,7);
+[c1,max_pool_1,max_index_1,c2,max_pool_2,max_index_2,c3,z1,a1,z2,p,loss] = ...
+forward(images,filter1,filter2,filter3,w1,w2,bias1,bias2,bias3,b1,b2,labels(1));
 iterate ++;
 printf("iterate = %d,loss = %f \n",iterate,loss);
 t=[t iterate];
