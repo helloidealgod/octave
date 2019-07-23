@@ -1,7 +1,8 @@
-function backward(p,label,a1,z1,w2)
+function [dfilter1,dfilter2,dfilter3,dw1,dw2,dbias1,dbias2,dbias3,db1,db2] = backward(sample,p,label,max_pool_1,max_index_1,filter2,max_pool_2,max_index_2,filter3,c3,w1,w2,z1,a1)
+addpath('./math');
 #softmax层梯度
 db2 = p;
-db2(labels(1)) = db2(labels(1)) - 1;
+db2(label) = db2(label) - 1;
 #db2 = p - y';
 dw2 = db2 * a1';
 #全连接层梯度
@@ -52,6 +53,6 @@ dfilter1 = zeros(5,5,1,20);
 for i = 1 : 20,
     dbias1 = sum(sum(dc1(:,:,i)));
     for j = 1 : 1,
-    dfilter1(:,:,j,i) = dfilter1(:,:,j,i) .+ convn(x(:,:,j),dc1(:,:,i),'valid');
+    dfilter1(:,:,j,i) = dfilter1(:,:,j,i) .+ convn(sample(:,:,j),dc1(:,:,i),'valid');
     end;
 end;
