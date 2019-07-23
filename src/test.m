@@ -1,8 +1,8 @@
 function test()
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%数据读取%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 fprintf('start reading file ... \n');
-images = loadMNISTImages("t10k-images.idx3-ubyte");
-labels = loadMNISTLabels("t10k-labels.idx1-ubyte");
+images = loadMNISTImages("../resource/t10k-images.idx3-ubyte");
+labels = loadMNISTLabels("../resource/t10k-labels.idx1-ubyte");
 fprintf('file read done \n');
 [m,n] = size(images);
 x = zeros(28,28,n);
