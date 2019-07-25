@@ -16,8 +16,8 @@ meanLoss = meanLoss / 10;
 fprintf('meanLoss = %f \n',meanLoss);
 iterate = 0;
 t=[0];
-m=[meanLoss];
-plot = plot(t,m,'EraseMode','background','MarkerSize',5);
+m_x=[meanLoss];
+plot = plot(t,m_x,'EraseMode','background','MarkerSize',5);
 axis([0 300 -2.5 2.5]);
 #打开网格
 grid on;
@@ -64,7 +64,7 @@ while meanLoss > 0.01,
     iterate ++;
     printf("iterate = %d,meanLoss = %f \n",iterate,meanLoss);
     t=[t iterate];
-    m=[m meanLoss];
-    set(plot,'XData',t,'YData',m);
+    m_x=[m_x meanLoss];
+    set(plot,'XData',t,'YData',m_x);
     drawnow;
 end;
